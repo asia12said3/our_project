@@ -240,7 +240,7 @@ const DragAndDrop = ({ data }) => {
 
       <div className="dragdrop-sentence-container">
         <div className="dragdrop-sentence">
-          <h2>Fill in the blank:</h2>
+          <h2>Drag the right Word:</h2>
           <div className="dragdrop-sentence-text">
             {currentS._Sentence_}{" "}
             <span

@@ -257,7 +257,7 @@ const MCQ = ({ data }) => {
                 <span className="mcq-answer-text">{answer._OptionText_}</span>
               </button>
               
-              {selectedAnswers[currentQuestion] === index && (
+              {/* {selectedAnswers[currentQuestion] === index && (
                 <div className="mcq-feedback-section">
                   <button 
                     className="mcq-feedback-btn"
@@ -285,7 +285,7 @@ const MCQ = ({ data }) => {
                     </div>
                   )}
                 </div>
-              )}
+              )} */}
             </div>
           ))}
         </div>
