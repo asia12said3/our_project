@@ -3,11 +3,12 @@ import "./MarkTheWord.css";
 
 const MarkTheWord = ({ data }) => {
   const [currentSentence, setCurrentSentence] = useState(0);
-  const [marked, setMarked] = useState({}); // { [sentenceIndex]: bool }
+  const [marked, setMarked] = useState({}); // { [sentenceIndex]: selectedOption }
   const [showResults, setShowResults] = useState(false);
   const [score, setScore] = useState(0);
   const [isStarted, setIsStarted] = useState(false);
   const [timeLeft, setTimeLeft] = useState(null);
+  const [showHelp, setShowHelp] = useState(false);
 
   // Parse Mark the Word data
   let mtData = data;
@@ -56,13 +57,18 @@ const MarkTheWord = ({ data }) => {
     setTimeLeft(totalSentences * 60);
   };
 
-  const handleMark = (sentenceIndex) => {
+  const handleMark = (sentenceIndex, option) => {
     if (marked[sentenceIndex]) return;
     setMarked(prev => {
-      const newMarked = { ...prev, [sentenceIndex]: true };
+      const newMarked = { ...prev, [sentenceIndex]: option };
       return newMarked;
     });
-    setScore(prev => prev + 1);
+    if (option === sentences[sentenceIndex]._Answer_) {
+      setScore(prev => prev + 1);
+      setShowHelp(false);
+    } else {
+      setShowHelp(true);
+    }
   };
 
   const handleSubmit = () => {
@@ -70,15 +76,13 @@ const MarkTheWord = ({ data }) => {
   };
 
   const handleNext = () => {
-    if (currentSentence < totalSentences - 1) {
-      setCurrentSentence(currentSentence + 1);
-    }
+    setCurrentSentence(currentSentence + 1);
+    setShowHelp(false);
   };
 
   const handlePrevious = () => {
-    if (currentSentence > 0) {
-      setCurrentSentence(currentSentence - 1);
-    }
+    setCurrentSentence(currentSentence - 1);
+    setShowHelp(false);
   };
 
   const handleRetry = () => {
@@ -88,6 +92,7 @@ const MarkTheWord = ({ data }) => {
     setScore(0);
     setIsStarted(false);
     setTimeLeft(null);
+    setShowHelp(false);
   };
 
   const formatTime = (seconds) => {
@@ -160,11 +165,14 @@ const MarkTheWord = ({ data }) => {
                 <div className="marktheword-review-sentence">
                   {sentence._Sentence_} <strong>{sentence._Answer_}</strong> {sentence._RestSentence_}
                 </div>
-                <div className={`marktheword-review-answer ${marked[index] ? "marktheword-correct" : "marktheword-incorrect"}`}>
-                  {marked[index]
+                <div className={`marktheword-review-answer ${marked[index] === sentence._Answer_ ? "marktheword-correct" : "marktheword-incorrect"}`}>
+                  {marked[index] === sentence._Answer_
                     ? "✔️ تم التحديد بشكل صحيح"
-                    : "لم يتم التحديد"}
+                    : marked[index] ? `❌ اخترت: ${marked[index]}` : "لم يتم التحديد"}
                 </div>
+                {sentence._Help_ && (
+                  <div className="marktheword-help">مساعدة: {sentence._Help_}</div>
+                )}
               </div>
             ))}
           </div>
@@ -207,47 +215,79 @@ const MarkTheWord = ({ data }) => {
       )}
       <div className="marktheword-sentence-container" style={{ textAlign: "right", fontSize: "1.5rem", direction: "rtl" }}>
         {currentS._Sentence_} {" "}
-        <span
-          className={`marktheword-inline-answer ${marked[currentSentence] ? "marked-correct" : ""}`}
-          style={{
-            display: "inline-block",
-            padding: "0.2em 0.7em",
-            margin: "0 0.2em",
-            borderRadius: "8px",
-            background: marked[currentSentence] ? "#d4edda" : "#f0f0f0",
-            color: marked[currentSentence] ? "#155724" : "#333",
-            border: marked[currentSentence] ? "2px solid #27ae60" : "2px solid #ccc",
-            cursor: marked[currentSentence] ? "default" : "pointer",
-            fontWeight: "bold",
-            position: "relative",
-            transition: "all 0.2s"
-          }}
-          onClick={() => handleMark(currentSentence)}
-        >
-          {currentS._Answer_}
-          {marked[currentSentence] && (
-            <span style={{
-              marginRight: "0.5em",
-              color: "#27ae60",
+        {currentS._Options_ && currentS._Options_.map((option, idx) => (
+          <span
+            key={idx}
+            className={`marktheword-option ${marked[currentSentence] ? (option === currentS._Answer_ ? "marked-correct" : marked[currentSentence] === option ? "marked-wrong" : "") : ""}`}
+            style={{
+              display: "inline-block",
+              padding: "0.2em 0.7em",
+              margin: "0 0.2em",
+              borderRadius: "8px",
+              background: marked[currentSentence]
+                ? option === currentS._Answer_ && marked[currentSentence] === option
+                  ? "#d4edda"
+                  : marked[currentSentence] === option
+                  ? "#f8d7da"
+                  : "#f0f0f0"
+                : "#f0f0f0",
+              color: marked[currentSentence]
+                ? option === currentS._Answer_ && marked[currentSentence] === option
+                  ? "#155724"
+                  : marked[currentSentence] === option
+                  ? "#721c24"
+                  : "#333"
+                : "#333",
+              border: marked[currentSentence]
+                ? option === currentS._Answer_ && marked[currentSentence] === option
+                  ? "2px solid #27ae60"
+                  : marked[currentSentence] === option
+                  ? "2px solid #dc3545"
+                  : "2px solid #ccc"
+                : "2px solid #ccc",
+              cursor: marked[currentSentence] ? "default" : "pointer",
               fontWeight: "bold",
-              fontSize: "1.2em"
-            }}>✔️</span>
-          )}
-          {marked[currentSentence] && (
-            <span style={{
-              position: "absolute",
-              top: "-1.7em",
-              right: "-2.5em",
-              background: "#27ae60",
-              color: "#fff",
-              borderRadius: "12px",
-              padding: "0.1em 0.7em",
-              fontSize: "1.1em",
-              fontWeight: "bold"
-            }}>+1</span>
-          )}
-        </span>
+              position: "relative",
+              transition: "all 0.2s"
+            }}
+            onClick={() => handleMark(currentSentence, option)}
+          >
+            {option}
+            {marked[currentSentence] && option === currentS._Answer_ && marked[currentSentence] === option && (
+              <span style={{
+                marginRight: "0.5em",
+                color: "#27ae60",
+                fontWeight: "bold",
+                fontSize: "1.2em"
+              }}>✔️</span>
+            )}
+            {marked[currentSentence] && option === currentS._Answer_ && marked[currentSentence] === option && (
+              <span style={{
+                position: "absolute",
+                top: "-1.7em",
+                right: "-2.5em",
+                background: "#27ae60",
+                color: "#fff",
+                borderRadius: "12px",
+                padding: "0.1em 0.7em",
+                fontSize: "1.1em",
+                fontWeight: "bold"
+              }}>+1</span>
+            )}
+            {marked[currentSentence] && marked[currentSentence] === option && option !== currentS._Answer_ && (
+              <span style={{
+                marginRight: "0.5em",
+                color: "#dc3545",
+                fontWeight: "bold",
+                fontSize: "1.2em"
+              }}>❌</span>
+            )}
+          </span>
+        ))}
         {" "}{currentS._RestSentence_}
+        {showHelp && currentS._Help_ && (
+          <div className="marktheword-help">مساعدة: {currentS._Help_}</div>
+        )}
       </div>
       <div className="marktheword-navigation">
         <button 

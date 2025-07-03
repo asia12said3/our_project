@@ -35,8 +35,14 @@ Note3: fill ALL the given fields of the Json (do not use null/empty), but do not
 Very important Notes:
  Note1: Please give each object an appropriate expressive name in the field “ObjectName”,
  Note2: All the Json fields must be in the same language of the book, 
-Note3: fill ALL the given fields of the Json (do not use null/empty), but do not give the answer, only a clue, Note4: tips or helps cannot be the same as the answer, {“Json Object”: “ObjectType”: <”typeName”: “Mark the Word”> “ObjectName”: “text_marking”, “AbstractParameter”:
- {"_TaskDescription_": "text", "Sentences": [ {“_Sentence_”: “text”}, {“_Answer_”: ”text”}, {“_RestSentence_”: ”text”} ] } }
+Note3: fill ALL the given fields of the Json (do not use null/empty), but do not give the answer, only a clue, Note4: tips or helps cannot be the same as the answer, 
+{“Json Object”: “ObjectType”: <”typeName”: “Mark the Word”> “ObjectName”: “text_marking”, “AbstractParameter”:
+ {"_TaskDescription_": "text", "Sentences": [ {“_Sentence_”: “text”, “_Answer_”: ”text”, “_RestSentence_”: ”text”, "_Options_": [
+      "<option>",
+          ...
+    ],
+    "help": "<help tipp>"
+} ] } }
  Very specific notes: 1) The field “_TaskDescription_” provides a general description of the task. 2) The array “Sentences” contains objects, where each object represents a sentence with: * “_Sentence_”: The part of the sentence before the word to be marked. * “_Answer_”: The correct word that should be marked. * “_RestSentence_”: The part of the sentence after the word to be marked.
  "ObjectName" make it short and descriptive for the questions and in the same language of the book
 `,
